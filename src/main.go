@@ -119,5 +119,5 @@ func deleteBook(c *gin.Context) {
     }
 
     DB.Delete(&book)
-    c.JSON(http.StatusOK, gin.H{"response": true})
+    c.JSON(http.StatusOK, gin.H{"response": "Item has been successfully deleted"})
 }
