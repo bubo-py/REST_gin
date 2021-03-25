@@ -7,6 +7,7 @@ import (
     _ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
+// gorm variable to initialize the database
 var DB *gorm.DB
 
 type Book struct {
@@ -26,21 +27,25 @@ type BookUpdateSchema struct { // fields don't need to be required
 }
 
 func main()  {
+    // Setting router
     r := gin.Default()
 
+    // API routes with corresponding functions
     r.GET("/api/books", getBooks)
     r.GET("/api/book/:id", getBook)
     r.POST("/api/create-book", createBook)
     r.PATCH("/api/update-book/:id", updateBook)
     r.DELETE("/api/delete-book/:id", deleteBook)
 
+    // Database connection via function below
     connectDB()
 
     r.Run()
 }
 
-// mock database connection
+// Mock database connection
 func connectDB() {
+    // making db with gorm
     database, err := gorm.Open("sqlite3", "test.db")
 
     if err != nil {
@@ -52,7 +57,7 @@ func connectDB() {
     DB = database
 }
 
-// get all books
+// Getting all books
 func getBooks(c *gin.Context) {
     var books []Book
     DB.Find(&books)
@@ -60,7 +65,7 @@ func getBooks(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"respond": books})
 }
 
-// get single book
+// Getting single, specified book
 func getBook(c *gin.Context) {
     var book Book
 
@@ -72,7 +77,7 @@ func getBook(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"respond": book})
 }
 
-
+// Adding book function
 func createBook(c *gin.Context) {
     // Input validation
     var input BookCreationSchema
@@ -89,10 +94,11 @@ func createBook(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"respond": book})
 }
 
-// updsssssss
+// Updating book function
 func updateBook(c *gin.Context) {
     var book Book
 
+    // Checks if given ID exists, if doesn't - return error
     if err := DB.Where("id = ?", c.Param("id")).First(&book).Error; err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "No item with given ID"})
             return
@@ -110,6 +116,7 @@ func updateBook(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"response": book})
 }
 
+// Deleting book function
 func deleteBook(c *gin.Context) {
     var book Book
 
